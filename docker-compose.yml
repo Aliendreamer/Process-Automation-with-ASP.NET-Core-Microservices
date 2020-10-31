@@ -5,16 +5,16 @@ services:
     data:
         container_name: sqlserver
         image: mcr.microsoft.com/mssql/server:2019-latest
-        ports: 
+        ports:
             - "1433:1433"
         environment:
             - ACCEPT_EULA=Y
             - SA_PASSWORD=yourStrongPassword12!@
-        volumes: 
-            - sqldata:/var/opt/mssql 
-        networks: 
+        volumes:
+            - sqldata:/var/opt/mssql
+        networks:
             - carrentalsystem-network
-    
+
     messages:
         container_name: rabbitmq
         image: rabbitmq:3-management
@@ -26,16 +26,16 @@ services:
             - RABBITMQ_DEFAULT_PASS=rabbitmqPassword12!
         volumes:
             - rabbitmq:/var/lib/rabbitmq/mnesia
-        networks: 
+        networks:
             - carrentalsystem-network
 
     identity:
         container_name: identity
-        image: ivaylokenov/carrentalsystem-identity-service
+        image: aliendreamer/carrentalsystem-identity-service
         build:
             context: ./Server
             dockerfile: ./CarRentalSystem.Identity/Dockerfile
-        ports: 
+        ports:
             - "5001:80"
         env_file: Server/CarRentalSystem/Common.env
         environment:
@@ -44,20 +44,20 @@ services:
         restart: on-failure
         volumes:
             - data-protection:/root/.aspnet/DataProtection-Keys
-        networks: 
+        networks:
             - carrentalsystem-network
         depends_on:
             - data
-            
+
     dealers:
         container_name: dealers
-        image: ivaylokenov/carrentalsystem-dealers-service
+        image: aliendreamer/carrentalsystem-dealer-service
         build:
             context: ./Server
             dockerfile: ./CarRentalSystem.Dealers/Dockerfile
-        ports: 
+        ports:
             - "5002:80"
-        env_file: 
+        env_file:
             - Server/CarRentalSystem/Common.env
         environment:
             - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CarRentalDealersDatabase;User Id=sa; Password=yourStrongPassword12!@;MultipleActiveResultSets=true
@@ -68,21 +68,21 @@ services:
         restart: on-failure
         volumes:
             - data-protection:/root/.aspnet/DataProtection-Keys
-        networks: 
+        networks:
             - carrentalsystem-network
         depends_on:
             - data
             - messages
-            
+
     statistics:
         container_name: statistics
-        image: ivaylokenov/carrentalsystem-statistics-service
+        image: aliendreamer/carrentalsystem-statistics-service
         build:
             context: ./Server
             dockerfile: ./CarRentalSystem.Statistics/Dockerfile
-        ports: 
+        ports:
             - "5003:80"
-        env_file: 
+        env_file:
             - Server/CarRentalSystem/Common.env
         environment:
             - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CarRentalStatisticsDatabase;User Id=sa; Password=yourStrongPassword12!@;MultipleActiveResultSets=true
@@ -93,21 +93,21 @@ services:
         restart: on-failure
         volumes:
             - data-protection:/root/.aspnet/DataProtection-Keys
-        networks: 
+        networks:
             - carrentalsystem-network
         depends_on:
             - data
             - messages
-            
+
     notifications:
         container_name: notifications
-        image: ivaylokenov/carrentalsystem-notifications-service
+        image: aliendreamer/carrentalsystem-notifications-service
         build:
             context: ./Server
             dockerfile: ./CarRentalSystem.Notifications/Dockerfile
-        ports: 
+        ports:
             - "5004:80"
-        env_file: 
+        env_file:
             - Server/CarRentalSystem/Common.env
         environment:
             - NotificationSettings__AllowedOrigins=http://localhost
@@ -117,20 +117,20 @@ services:
         restart: on-failure
         volumes:
             - data-protection:/root/.aspnet/DataProtection-Keys
-        networks: 
+        networks:
             - carrentalsystem-network
         depends_on:
             - messages
 
     client:
         container_name: client
-        image: ivaylokenov/carrentalsystem-user-client
+        image: aliendreamer/carrentalsystem-user-client
         build:
             context: ./Client
             dockerfile: ./Dockerfile
             args:
                 configuration: development
-        ports: 
+        ports:
             - "80:80"
         restart: on-failure
         depends_on:
@@ -138,14 +138,14 @@ services:
             - dealers
             - statistics
             - notifications
-            
+
     admin:
         container_name: admin
-        image: ivaylokenov/carrentalsystem-admin-client
+        image: aliendreamer/carrentalsystem-admin-client
         build:
             context: ./Server
             dockerfile: ./CarRentalSystem.Admin/Dockerfile
-        ports: 
+        ports:
             - "5000:80"
         env_file: Server/CarRentalSystem/Common.env
         environment:
@@ -155,20 +155,20 @@ services:
         restart: on-failure
         volumes:
             - data-protection:/root/.aspnet/DataProtection-Keys
-        networks: 
+        networks:
             - carrentalsystem-network
         depends_on:
             - identity
             - dealers
             - statistics
-            
+
     watchdog:
         container_name: watchdog
-        image: ivaylokenov/carrentalsystem-watchdog-service
+        image: aliendreamer/carrentalsystem-watchdog-service
         build:
             context: ./Server
             dockerfile: ./CarRentalSystem.Watchdog/Dockerfile
-        ports: 
+        ports:
             - "5500:80"
         environment:
             - HealthChecks-UI__HealthChecks__0__Name=Identity
@@ -182,7 +182,7 @@ services:
             - HealthChecks-UI__HealthChecks__4__Name=Admin
             - HealthChecks-UI__HealthChecks__4__Uri=http://admin/health
         restart: on-failure
-        networks: 
+        networks:
             - carrentalsystem-network
         depends_on:
             - identity

@@ -42,9 +42,20 @@ pipeline {
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
-            def image = docker.image("aliendreamer/carrentalsystem-identity-service")
-            //image.push("1.0.${env.BUILD_ID}")
-            image.push('latest')
+            def identityimage = docker.image("aliendreamer/carrentalsystem-identity-service")
+            identityimage.push('latest')
+            def watchdogimage = docker.image("aliendreamer/carrentalsystem-watchdog-service")
+            watchdogimage.push('latest')
+            def dealerimage = docker.image("aliendreamer/carrentalsystem-dealer-service")
+            dealerimage.push('latest')
+            def statisticsimage = docker.image("aliendreamer/carrentalsystem-statistics-service")
+            statisticsimage.push('latest')
+            def notificationsimage = docker.image("aliendreamer/carrentalsystem-notifications-service")
+            notificationsimage.push('latest')
+            def adminclientimage = docker.image("aliendreamer/carrentalsystem-admin-client")
+            adminclientimage.push('latest')
+            def userclientimage = docker.image("aliendreamer/carrentalsystem-user-client")
+            userclientimage.push('latest')
           }
         }
       }
