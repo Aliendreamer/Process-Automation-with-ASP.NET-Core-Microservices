@@ -39,7 +39,6 @@ pipeline {
 
     // }
     stage('Push Images') {
-      when { branch 'origin/main' }
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
