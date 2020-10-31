@@ -36,26 +36,31 @@ pipeline {
     //     powershell(script: 'docker-compose down')
     //     // powershell(script: 'docker volumes prune -f')
     //   }
-    //   post {
-	  //   success {
-	  //     echo "Build successfull! You should deploy! :)"
-	  //   }
-	  //   failure {
-	  //     echo "Build failed! You should receive an e-mail! :("
-	  //   }
-    //   }
+
     // }
-    // stage('Push Images') {
-    //   when { branch 'main' }
-    //   steps {
-    //     script {
-    //       docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
-    //         def image = docker.image("ivaylokenov/carrentalsystem-identity-service")
-    //         image.push("1.0.${env.BUILD_ID}")
-    //         image.push('latest')
-    //       }
-    //     }
-    //   }
-    // }
+    stage('Push Images') {
+      when { branch 'main' }
+      steps {
+        script {
+          docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
+            def image = docker.image("ivaylokenov/carrentalsystem-identity-service")
+            image.push("1.0.${env.BUILD_ID}")
+            image.push('latest')
+          }
+        }
+      }
+    }
+  }
+   post {
+    failure {
+        mail to: 'dreamingman83@gmail.com',
+             subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+             body: "Something is wrong with ${env.BUILD_URL}"
+    }
+     success {
+        mail to: 'dreamingman83@gmail.com',
+             subject: "Success Pipeline: ${currentBuild.fullDisplayName}",
+             body: "Build with ${env.BUILD_URL} succeeded"
+    }
   }
 }
