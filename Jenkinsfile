@@ -15,12 +15,12 @@ pipeline {
     //     """)
     //   }
     // }
-    // stage('Docker Build') {
-    //   steps {
-    //     powershell(script: 'docker-compose build')
-    //     powershell(script: 'docker images -a')
-    //   }
-    // }
+    stage('Docker Build') {
+      steps {
+        powershell(script: 'docker-compose build')
+        powershell(script: 'docker images -a')
+      }
+    }
     // stage('Run Test Application') {
     //   steps {
     //     powershell(script: 'docker-compose up -d')
