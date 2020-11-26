@@ -4,19 +4,8 @@ metadata:
     name: identity-service-data
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 10Mi
-      - name: IdentitySettings__AdminPassword
-        valueFrom:
-          secretKeyRef:
-            name: environment-secrets
-            key: admin-password
-    volumeMounts:
-        - name: identity-service-data
-          mountPath: /root/.aspnet/DataProtection-Keys
-  volumes:
-    - name: identity-service-data
-      persistentVolumeClaim:
-      claimName: identity-service-data
+

@@ -43,3 +43,10 @@ spec:
               secretKeyRef:
                 name: environment-secrets
                 key: admin-password
+          volumeMounts:
+          - name: identity-service-data
+            mountPath: /root/.aspnet/DataProection-Keys
+        volumes:
+        - name: identity-service-data
+          persistentVolumeClaim:
+            claimName: identity-service-data
