@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: admin-client
-        image: ivaylokenov/carrentalsystem-admin-client:latest
+        image: aliendreamer/carrentalsystem-admin-client:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

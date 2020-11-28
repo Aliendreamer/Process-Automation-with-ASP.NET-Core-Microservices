@@ -5,7 +5,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  - ReadOnlyMany 
+  - ReadOnlyMany
   resources:
     requests:
       storage: 10Mi
@@ -49,7 +49,7 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: notifications-service
-        image: ivaylokenov/carrentalsystem-notifications-service:latest
+        image: aliendreamer/carrentalsystem-notifications-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

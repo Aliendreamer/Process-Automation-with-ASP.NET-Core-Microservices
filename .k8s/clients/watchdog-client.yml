@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: watchdog-client
-        image: ivaylokenov/carrentalsystem-watchdog-service:latest
+        image: aliendreamer/carrentalsystem-watchdog-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

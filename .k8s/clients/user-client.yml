@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: user-client
-        image: ivaylokenov/carrentalsystem-user-client:latest
+        image: aliendreamer/carrentalsystem-user-client:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
