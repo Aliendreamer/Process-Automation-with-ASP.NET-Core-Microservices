@@ -6,11 +6,11 @@ pipeline {
         echo "$GIT_BRANCH"
       }
     }
-    stage('Pull Changes') {
-      steps {
-        powershell(script: "git pull")
-      }
-    }
+    // stage('Pull Changes') {
+    //   steps {
+    //     powershell(script: "git pull")
+    //   }
+    // }
     // stage('Run Unit Tests') {
     //   steps {
     //     echo "$GIT_BRANCH"
