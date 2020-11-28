@@ -1,7 +1,17 @@
 pipeline {
   agent any
   stages {
-    stage('Verify Branch') {
+    // stage('Verify Branch') {
+    //   steps {
+    //     echo "$GIT_BRANCH"
+    //   }
+    // }
+    stage('Pull Changes') {
+      steps {
+        powershell(script: "git pull")
+      }
+    }
+    stage('Run Unit Tests') {
       steps {
         echo "$GIT_BRANCH"
       }
@@ -18,6 +28,7 @@ pipeline {
     stage('Docker Build') {
       steps {
         powershell(script: 'docker-compose build')
+       // powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-development --build-arg configuration=development ./Client')
         powershell(script: 'docker images -a')
       }
     }
@@ -57,6 +68,19 @@ pipeline {
             def userclientimage = docker.image("aliendreamer/carrentalsystem-user-client")
             userclientimage.push('latest')
           }
+        }
+      }
+    }
+    stage('Deploy Development') {
+      when { branch 'main' }
+      steps {
+        withKubeConfig([credentialsId: 'DevelopmentServer', serverUrl: 'https://35.193.120.112']) {
+		       powershell(script: 'kubectl apply -f ./.k8s/.environment/development.yml')
+		       powershell(script: 'kubectl apply -f ./.k8s/databases')
+		       powershell(script: 'kubectl apply -f ./.k8s/event-bus')
+		       powershell(script: 'kubectl apply -f ./.k8s/web-services')
+           powershell(script: 'kubectl apply -f ./.k8s/clients')
+           powershell(script: 'kubectl set image deployments/user-client user-client=ivaylokenov/carrentalsystem-user-client-development:latest')
         }
       }
     }
