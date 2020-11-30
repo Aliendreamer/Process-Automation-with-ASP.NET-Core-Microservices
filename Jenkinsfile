@@ -105,12 +105,12 @@ pipeline {
     //     }
     //   }
     // }
-    stage("Test deployment"){
-      when{branch:"main"}
-      steps{
-          powershell(script: './Tests/ContainerTests.ps1')
-      }
-    }
+    // stage("Test deployment"){
+    //   when{branch:"main"}
+    //   steps{
+    //       powershell(script: './Tests/ContainerTests.ps1')
+    //   }
+    // }
   }
 
   stage("Ask permission"){
