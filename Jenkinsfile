@@ -1,8 +1,8 @@
 pipeline {
   agent any
   environment{
-    developVersion: "latest"
-    prodVersion: "1.0.${env.BUILD_ID}"
+    developVersion = "latest"
+    prodVersion = "1.0.${env.BUILD_ID}"
   }
   stages {
     stage('Verify Branch') {
