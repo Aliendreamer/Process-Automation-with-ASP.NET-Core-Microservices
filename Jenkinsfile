@@ -1,21 +1,21 @@
 pipeline {
   agent any
+  environment{
+    developVersion: "latest"
+    prodVersion: "1.0.${env.BUILD_ID}"
+  }
   stages {
     stage('Verify Branch') {
       steps {
         echo "$GIT_BRANCH"
       }
     }
-    // stage('Pull Changes') {
-    //   steps {
-    //     powershell(script: "git pull")
-    //   }
-    // }
-    // stage('Run Unit Tests') {
-    //   steps {
-    //     echo "$GIT_BRANCH"
-    //   }
-    // }
+
+    stage('Echo the branch') {
+      steps {
+        echo "$GIT_BRANCH"
+      }
+    }
     stage('Run Unit Tests') {
       steps {
         powershell(script: """
@@ -28,7 +28,7 @@ pipeline {
     stage('Docker Build') {
       steps {
         powershell(script: 'docker-compose build')
-       // powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-development --build-arg configuration=development ./Client')
+         // powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-development --build-arg configuration=development ./Client')
         powershell(script: 'docker images -a')
       }
     }
@@ -45,44 +45,89 @@ pipeline {
     stage('Stop Test Application') {
       steps {
         powershell(script: 'docker-compose down')
-        // powershell(script: 'docker volumes prune -f')
+        powershell(script: 'docker volumes prune -f')
       }
 
     }
     stage('Push Images') {
       steps {
         script {
-          docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
-            def identityimage = docker.image("aliendreamer/carrentalsystem-identity-service")
-            identityimage.push('latest')
-            def watchdogimage = docker.image("aliendreamer/carrentalsystem-watchdog-service")
-            watchdogimage.push('latest')
-            def dealerimage = docker.image("aliendreamer/carrentalsystem-dealer-service")
-            dealerimage.push('latest')
-            def statisticsimage = docker.image("aliendreamer/carrentalsystem-statistics-service")
-            statisticsimage.push('latest')
-            def notificationsimage = docker.image("aliendreamer/carrentalsystem-notifications-service")
-            notificationsimage.push('latest')
-            def adminclientimage = docker.image("aliendreamer/carrentalsystem-admin-client")
-            adminclientimage.push('latest')
-            def userclientimage = docker.image("aliendreamer/carrentalsystem-user-client")
-            userclientimage.push('latest')
+          if(env.GIT_BRANCH =="main"){
+             docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
+              def identityimage = docker.image("aliendreamer/carrentalsystem-identity-service")
+              identityimage.push(env.prodVersion)
+              def watchdogimage = docker.image("aliendreamer/carrentalsystem-watchdog-service")
+              watchdogimage.push(env.prodVersion)
+              def dealerimage = docker.image("aliendreamer/carrentalsystem-dealer-service")
+              dealerimage.push(env.prodVersion)
+              def statisticsimage = docker.image("aliendreamer/carrentalsystem-statistics-service")
+              statisticsimage.push(env.prodVersion)
+              def notificationsimage = docker.image("aliendreamer/carrentalsystem-notifications-service")
+              notificationsimage.push(env.prodVersion)
+              def adminclientimage = docker.image("aliendreamer/carrentalsystem-admin-client")
+              adminclientimage.push(env.prodVersion)
+              def userclientimage = docker.image("aliendreamer/carrentalsystem-user-client")
+              userclientimage.push(env.prodVersion)
+           }
           }
+          if(env.GIT_BRANCH ==="develop"){
+            docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
+                def identityimage = docker.image("aliendreamer/carrentalsystem-identity-service")
+                identityimage.push("latest")
+                def watchdogimage = docker.image("aliendreamer/carrentalsystem-watchdog-service")
+                watchdogimage.push('latest')
+                def dealerimage = docker.image("aliendreamer/carrentalsystem-dealer-service")
+                dealerimage.push('latest')
+                def statisticsimage = docker.image("aliendreamer/carrentalsystem-statistics-service")
+                statisticsimage.push('latest')
+                def notificationsimage = docker.image("aliendreamer/carrentalsystem-notifications-service")
+                notificationsimage.push('latest')
+                def adminclientimage = docker.image("aliendreamer/carrentalsystem-admin-client")
+                adminclientimage.push('latest')
+                def userclientimage = docker.image("aliendreamer/carrentalsystem-user-client")
+                userclientimage.push('latest')
+            }
+          }
+
         }
       }
     }
-    stage('Deploy Development') {
-      when { branch 'main' }
-      steps {
-        withKubeConfig([credentialsId: 'DevelopmentServer', serverUrl: 'https://35.193.120.112']) {
-		       powershell(script: 'kubectl apply -f ./.k8s/.environment/development.yml')
-		       powershell(script: 'kubectl apply -f ./.k8s/databases')
-		       powershell(script: 'kubectl apply -f ./.k8s/event-bus')
-		       powershell(script: 'kubectl apply -f ./.k8s/web-services')
-           powershell(script: 'kubectl apply -f ./.k8s/clients')
-           powershell(script: 'kubectl set image deployments/user-client user-client=aliendreamer/carrentalsystem-user-client-development:latest')
-        }
+    // stage('Deploy Development') {
+    //   when { branch 'main||develop' }
+    //   steps {
+    //     withKubeConfig([credentialsId: 'DevelopmentServer', serverUrl: 'https://35.193.120.112']) {
+		//        powershell(script: 'kubectl apply -f ./.k8s/.environment/development.yml')
+		//        powershell(script: 'kubectl apply -f ./.k8s/databases')
+		//        powershell(script: 'kubectl apply -f ./.k8s/event-bus')
+		//        powershell(script: 'kubectl apply -f ./.k8s/web-services')
+    //        powershell(script: 'kubectl apply -f ./.k8s/clients')
+    //        powershell(script: 'kubectl set image deployments/user-client user-client=aliendreamer/carrentalsystem-user-client-development:latest')
+    //     }
+    //   }
+    // }
+    stage("Test deployment"){
+      when{branch:"main"}
+      steps{
+          powershell(script: './Tests/ContainerTests.ps1')
       }
+    }
+  }
+
+  stage("Ask permission"){
+    when{branch: "main"}
+    steps{
+          try {
+            timeout(time: 60, unit: 'SECONDS') {
+                input message: 'Do you want to release this build?',
+                      parameters: [[$class: 'BooleanParameterDefinition',
+                                    defaultValue: false,
+                                    description: 'Ticking this box will do a release',
+                                    name: 'Release']]
+            }
+        } catch (err) {
+            def user = err.getCauses()[0].getUser()
+            echo "Aborted by:\n ${user}"
+        }
     }
   }
    post {
