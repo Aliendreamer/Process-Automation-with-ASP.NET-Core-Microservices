@@ -1,8 +1,8 @@
 pipeline {
   agent any
   environment{
-    developVersion = "latest"
-    prodVersion = "1.0.${env.BUILD_ID}"
+    developVersion= "latest"
+    prodVersion= "1.0.${env.BUILD_ID}"
   }
   stages {
     stage('Verify Branch') {
@@ -111,7 +111,7 @@ pipeline {
     //       powershell(script: './Tests/ContainerTests.ps1')
     //   }
     // }
-  //}
+
 
   stage("Ask permission"){
     when{branch: "main"}
@@ -130,6 +130,7 @@ pipeline {
         }
     }
   }
+}
    post {
     failure {
         mail to: 'dreamingman83@gmail.com',
