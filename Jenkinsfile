@@ -116,6 +116,7 @@ pipeline {
   stage("Ask permission"){
     when{branch: "main"}
     steps{
+      script{
           try {
             timeout(time: 60, unit: 'SECONDS') {
                 input message: 'Do you want to release this build?',
@@ -128,6 +129,7 @@ pipeline {
             def user = err.getCauses()[0].getUser()
             echo "Aborted by:\n ${user}"
         }
+     }
     }
   }
 }
