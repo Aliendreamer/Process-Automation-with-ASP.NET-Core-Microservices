@@ -111,7 +111,7 @@ pipeline {
     //       powershell(script: './Tests/ContainerTests.ps1')
     //   }
     // }
-  }
+  //}
 
   stage("Ask permission"){
     when{branch: "main"}
