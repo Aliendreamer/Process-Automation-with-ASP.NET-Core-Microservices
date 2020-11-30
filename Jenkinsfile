@@ -70,7 +70,7 @@ pipeline {
               userclientimage.push(env.prodVersion)
            }
           }
-          if(env.GIT_BRANCH ==="develop"){
+          if(env.GIT_BRANCH == "develop"){
             docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
                 def identityimage = docker.image("aliendreamer/carrentalsystem-identity-service")
                 identityimage.push("latest")
@@ -114,7 +114,7 @@ pipeline {
 
 
   stage("Ask permission"){
-    when{branch "main"}
+    when {branch "main"}
     steps{
       script{
           try {
