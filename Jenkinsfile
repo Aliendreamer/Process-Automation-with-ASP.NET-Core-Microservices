@@ -106,7 +106,7 @@ pipeline {
     //   }
     // }
     // stage("Test deployment"){
-    //   when{branch:"main"}
+    //   when{branch "main"}
     //   steps{
     //       powershell(script: './Tests/ContainerTests.ps1')
     //   }
@@ -114,7 +114,7 @@ pipeline {
 
 
   stage("Ask permission"){
-    when{branch: "main"}
+    when{branch "main"}
     steps{
       script{
           try {
