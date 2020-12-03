@@ -28,7 +28,7 @@ pipeline {
     stage('Docker Build') {
       steps {
         powershell(script: 'docker-compose build')
-         // powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-development --build-arg configuration=development ./Client')
+        powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-development --build-arg configuration=development ./Client')
         powershell(script: 'docker images -a')
       }
     }
@@ -96,7 +96,7 @@ pipeline {
     stage('Deploy Development') {
       when { branch 'develop' }
       steps {
-        withKubeConfig([credentialsId: 'JenkinsDev', serverUrl: 'https://35.184.65.141']) {
+        withKubeConfig([credentialsId: 'DevelopmentServer', serverUrl: 'https://35.184.65.141']) {
 		       powershell(script: 'kubectl apply -f ./.k8s/.environment/development.yml')
 		       powershell(script: 'kubectl apply -f ./.k8s/databases')
 		       powershell(script: 'kubectl apply -f ./.k8s/event-bus')
