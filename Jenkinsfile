@@ -38,7 +38,7 @@ pipeline {
        when { branch 'main' }
       steps {
         powershell(script: 'docker-compose build')
-        powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-development --build-arg configuration=production ./Client')
+        powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-production --build-arg configuration=production ./Client')
         powershell(script: 'docker images -a')
       }
     }
@@ -143,6 +143,31 @@ pipeline {
      }
     }
   }
+
+    // hit edge case here, second cluster not allowed or at least exceeding the balancers limit for some reason
+     stage('Deploy Production') {
+      when { branch 'main' }
+      steps {
+        withKubeConfig([credentialsId: 'xxxx', serverUrl: 'xxxxx']) {
+		       powershell(script: 'kubectl apply -f ./.k8s/.environment/development.yml')
+		       powershell(script: 'kubectl apply -f ./.k8s/databases')
+		       powershell(script: 'kubectl apply -f ./.k8s/event-bus')
+		       powershell(script: 'kubectl apply -f ./.k8s/web-services')
+           powershell(script: 'kubectl apply -f ./.k8s/clients')
+           //powershell(script: 'kubectl set image deployments/user-client user-client=aliendreamer/carrentalsystem-user-client-production:${env.prodVersion}')
+            sh 'kubectl set image deployments/user-client user-client=aliendreamer/carrentalsystem-user-client-production:${env.prodVersion}'
+            sh 'kubectl set image deployments/user-client user-client=aliendreamer/carrentalsystem-user-client-production:${env.prodVersion}'
+            sh 'kubectl set image deployments/identity-service identity-service=aliendreamer/carrentalsystem-identity-service:${env.prodVersion}'
+            sh 'kubectl set image deployments/dealers-service dealers-service=aliendreamer/carrentalsystem-dealer-service:${env.prodVersion}'
+        }
+      }
+    }
+    stage("Test production"){
+      when{branch "main"}
+      steps{
+          powershell(script: './Tests/ContainerTestsProd.ps1')
+      }
+    }
 }
    post {
     failure {
