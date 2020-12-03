@@ -32,6 +32,7 @@ pipeline {
         powershell(script: 'docker images -a')
       }
     }
+
     stage('Run Test Application') {
       steps {
         powershell(script: 'docker-compose up -d')
