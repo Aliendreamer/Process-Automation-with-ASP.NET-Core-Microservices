@@ -1,7 +1,7 @@
 export const environment = {
     production: true,
-    identityApiUrl: 'http://35.188.60.251:5001/',
-    dealersApiUrl: 'http://34.71.166.219:5002/',
-    statisticsApiUrl: 'http://34.71.16.80:5003/',
-    notificationsUrl: 'http://34.66.11.105:5004/'
-  };
+    identityApiUrl: 'http://35.223.57.78:5001/',
+    dealersApiUrl: 'http://35.184.248.31:5002/',
+    statisticsApiUrl: 'http://34.121.134.9:5003/',
+    notificationsUrl: 'http://35.223.45.44:5004/'
+};
