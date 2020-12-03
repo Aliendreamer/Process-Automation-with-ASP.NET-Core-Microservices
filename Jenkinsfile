@@ -25,10 +25,20 @@ pipeline {
         """)
       }
     }
-    stage('Docker Build') {
+    stage('Docker Build Development') {
+       when { branch 'develop' }
       steps {
         powershell(script: 'docker-compose build')
         powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-development --build-arg configuration=development ./Client')
+        powershell(script: 'docker images -a')
+      }
+    }
+
+     stage('Docker Build Production') {
+       when { branch 'main' }
+      steps {
+        powershell(script: 'docker-compose build')
+        powershell(script: 'docker build -t aliendreamer/carrentalsystem-user-client-development --build-arg configuration=production ./Client')
         powershell(script: 'docker images -a')
       }
     }
@@ -106,12 +116,12 @@ pipeline {
         }
       }
     }
-    // stage("Test deplopment"){
-    //   when{branch "main"}
-    //   steps{
-    //       powershell(script: './Tests/ContainerTests.ps1')
-    //   }
-    // }
+    stage("Test deplopment"){
+      when{branch "develop"}
+      steps{
+          powershell(script: './Tests/ContainerTestsDev.ps1')
+      }
+    }
 
 
   stage("Ask permission"){
