@@ -96,7 +96,7 @@ pipeline {
     stage('Deploy Development') {
       when { branch 'develop' }
       steps {
-        withKubeConfig([credentialsId: 'JenkinsDev', serverUrl: 'https://35.184.65.141']) {
+        withKubeConfig([credentialsId: 'DevelopmentServer', serverUrl: 'https://35.184.65.141']) {
 		       powershell(script: 'kubectl apply -f ./.k8s/.environment/development.yml')
 		       powershell(script: 'kubectl apply -f ./.k8s/databases')
 		       powershell(script: 'kubectl apply -f ./.k8s/event-bus')
